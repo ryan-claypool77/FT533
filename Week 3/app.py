@@ -2,7 +2,7 @@ from dash import Dash, html, dcc, dash_table, Input, Output, State
 import eikon as ek  # cut out refinitiv.dataplatform.eikon
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, date
 from plotly.express import scatter
 import os
 import statsmodels as sm
@@ -17,12 +17,23 @@ app.layout = html.Div([
         dcc.Input(id='benchmark-id', type='text', value="IVV"),
         dcc.Input(id='asset-id', type='text', value="AAPL.O")
     ]),
+
+    html.Div([
+        dcc.DatePickerRange(
+            id='my-date-picker-range',
+            start_date_placeholder_text="Start Period",
+            end_date_placeholder_text="End Period",
+            calendar_orientation='vertical',
+            max_date_allowed=datetime.now(),
+            month_format='YYYY-MM-DD'
+        )
+    ]),
     html.Button('QUERY Refinitiv', id='run-query', n_clicks=0),
     html.H2('Raw Data from Refinitiv'),
     dash_table.DataTable(
         id="history-tbl",
         page_action='none',
-        style_table={'height': '300px', 'overflowY': 'auto'}
+        style_table={'height': '100px', 'overflowY': 'auto'}
     ),
     html.H2('Historical Returns'),
     dash_table.DataTable(
@@ -39,10 +50,11 @@ app.layout = html.Div([
 @app.callback(
     Output("history-tbl", "data"),
     Input("run-query", "n_clicks"),
-    [State('benchmark-id', 'value'), State('asset-id', 'value')],
+    [State('benchmark-id', 'value'), State('asset-id', 'value'),
+     State('my-date-picker-range', 'start_date'), State('my-date-picker-range', 'end_date')],
     prevent_initial_call=True
 )
-def query_refinitiv(n_clicks, benchmark_id, asset_id):
+def query_refinitiv(n_clicks, benchmark_id, asset_id, start_date, end_date):
     assets = [benchmark_id, asset_id]
     prices, prc_err = ek.get_data(
         instruments=assets,
@@ -54,8 +66,8 @@ def query_refinitiv(n_clicks, benchmark_id, asset_id):
             'TR.PriceCloseDate'
         ],
         parameters={
-            'SDate': '2017-01-01',
-            'EDate': datetime.now().strftime("%Y-%m-%d"),
+            'SDate': start_date,  # example placeholder w/ formatting: '2017-01-01',
+            'EDate': end_date,  # example with pulling today's date: datetime.now().strftime("%Y-%m-%d"),
             'Frq': 'D'
         }
     )
@@ -69,8 +81,8 @@ def query_refinitiv(n_clicks, benchmark_id, asset_id):
             'TR.DivPaymentType'
         ],
         parameters={
-            'SDate': '2017-01-01',
-            'EDate': datetime.now().strftime("%Y-%m-%d"),
+            'SDate': start_date,  # example placeholder w/ formatting: '2017-01-01',
+            'EDate': end_date,  # example with pulling today's date: datetime.now().strftime("%Y-%m-%d"),
             'Frq': 'D'
         }
     )
@@ -80,8 +92,8 @@ def query_refinitiv(n_clicks, benchmark_id, asset_id):
         fields=['TR.CAEffectiveDate', 'TR.CAAdjustmentFactor'],
         parameters={
             "CAEventType": "SSP",
-            'SDate': '2017-01-01',
-            'EDate': datetime.now().strftime("%Y-%m-%d"),
+            'SDate': start_date,  # example placeholder w/ formatting: '2017-01-01',
+            'EDate': end_date,  # example with pulling today's date: datetime.now().strftime("%Y-%m-%d"),
             'Frq': 'D'
         }
     )
