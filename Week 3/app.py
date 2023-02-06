@@ -14,7 +14,21 @@ ek.set_app_key(os.getenv('EIKON_API'))
 app = Dash(__name__)
 app.layout = html.Div([
     html.Div([
+        # html.H5('Benchmark', id="benchmark-id"),
+        html.Label('Benchmark', htmlFor="benchmark-id",
+                   style={
+                       'padding-right': '10px',
+                       'padding-left': '10px',
+                       'font-size': '20px'
+                   }),
         dcc.Input(id='benchmark-id', type='text', value="IVV"),
+        html.Label('Asset', htmlFor="asset-id",
+                   style={
+                       'padding-right': '10px',
+                       'padding-left': '10px',
+                       'font-size': '20px'
+
+                   }),
         dcc.Input(id='asset-id', type='text', value="AAPL.O")
     ]),
 
@@ -25,7 +39,10 @@ app.layout = html.Div([
             end_date_placeholder_text="End Period",
             calendar_orientation='vertical',
             max_date_allowed=datetime.now(),
-            month_format='YYYY-MM-DD'
+            month_format='YYYY-MM-DD',
+            style={
+                'font-size': '20px'
+            }
         )
     ]),
     html.Button('QUERY Refinitiv', id='run-query', n_clicks=0),
