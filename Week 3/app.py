@@ -3,7 +3,7 @@ import eikon as ek  # cut out refinitiv.dataplatform.eikon
 import pandas as pd
 import numpy as np
 from datetime import datetime, date
-from plotly.express import scatter
+import plotly.express as px
 import os
 import statsmodels as sm
 
@@ -35,8 +35,8 @@ app.layout = html.Div([
     html.Div([
         dcc.DatePickerRange(
             id='my-date-picker-range',
-            start_date_placeholder_text="Start Period",
-            end_date_placeholder_text="End Period",
+            start_date_placeholder_text="2017-01-01",  # "Start Period"
+            end_date_placeholder_text="2023-01-30",  # "End Period"
             calendar_orientation='vertical',
             max_date_allowed=datetime.now(),
             month_format='YYYY-MM-DD',
@@ -59,6 +59,34 @@ app.layout = html.Div([
         style_table={'height': '300px', 'overflowY': 'auto'}
     ),
     html.H2('Alpha & Beta Scatter Plot'),
+    html.Label('Alpha:', htmlFor="alpha",
+                   style={
+                       'padding-right': '10px',
+                       'padding-left': '30px',
+                       'font-size': '20px'
+                   }),
+    html.H4(id='alpha'),
+    html.Label('Beta:', htmlFor="alpha",
+               style={
+                   'padding-right': '10px',
+                   'padding-left': '30px',
+                   'font-size': '20px'
+               }),
+    html.H4(id='beta'),
+    html.Div([
+        dcc.DatePickerRange(
+            id='my-date-picker-range-plot',
+            start_date_placeholder_text="Start Period",
+            end_date_placeholder_text="End Period",
+            calendar_orientation='vertical',
+            max_date_allowed=datetime.now(),
+            month_format='YYYY-MM-DD',
+            style={
+                'font-size': '20px'
+            }
+        )
+    ]),
+    html.Button('Update Plot', id='run-query', n_clicks=0),
     dcc.Graph(id="ab-plot"),
     html.P(id='summary-text', children="")
 ])
@@ -173,10 +201,18 @@ def query_refinitiv(n_clicks, benchmark_id, asset_id, start_date, end_date):
 @app.callback(
     Output("returns-tbl", "data"),
     Input("history-tbl", "data"),
+    [State('my-date-picker-range-plot', 'start_date'), State('my-date-picker-range-plot', 'end_date')],
     prevent_initial_call=True
 )
-def calculate_returns(history_tbl):
+def calculate_returns(history_tbl, start_date, end_date):
     dt_prc_div_splt = pd.DataFrame(history_tbl)
+
+    if start_date is not None:
+        if end_date is not None:
+            dt_prc_div_splt = dt_prc_div_splt.loc[(dt_prc_div_splt['Date'] >= start_date)
+                                                  & (dt_prc_div_splt['Date'] <= end_date)]
+
+
 
     # Define what columns contain the Identifier, date, price, div, & split info
     ins_col = 'Instrument'
@@ -213,8 +249,15 @@ def calculate_returns(history_tbl):
     prevent_initial_call=True
 )
 def render_ab_plot(returns, benchmark_id, asset_id):
+    plot = px.scatter(returns, x=benchmark_id, y=asset_id, trendline='ols')
+    model = px.get_trendline_results(plot)
+    results = model.iloc[0]["px_fit_results"]
+    alpha = results.params[0]
+    beta = results.params[1]
+
     return (
-        scatter(returns, x=benchmark_id, y=asset_id, trendline='ols')
+        px.scatter(returns, x=benchmark_id, y=asset_id, trendline='ols')
+        # print on the web page (Alpha, Beta)
     )
 
 
