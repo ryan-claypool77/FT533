@@ -155,3 +155,36 @@ print(live_entry_orders)
 
 print("entry_orders:")
 print(entry_orders)
+
+
+# ******** RYAN'S CODE FOR EXIT ORDERS ***********
+# Parameters:
+alpha2 = 0.01
+n1 = 5
+
+# submitted exit orders
+submitted_exit_orders = pd.DataFrame({
+    "trade_id": range(1, ivv_prc.shape[0]),
+    "date": list(pd.to_datetime(ivv_prc["Date"].iloc[1:]).dt.date),
+    "asset": "IVV",
+    "trip": 'EXIT',
+    "action": "SELL",
+    "type": "LMT",
+    "price": round(
+        ivv_prc['Close Price'].iloc[:-1] * (1 + alpha2), # !!! change [Close Price] to Entry Price
+        2
+    ),
+    'status': 'SUBMITTED'
+})
+
+# if limit order filled, immediately issue a limit order to sell asset at Entry Price * 1+ alpha2
+
+
+# calc exit orders that filled; create subset that updates status, date, and price.
+
+
+# if exit order not filled by the time market is about to close on n2th trading day,
+# cancel the limit order immediately and issue a market order to sell at the day's closing price.
+
+# combine all captured subsets and add to existing blotter table
+
