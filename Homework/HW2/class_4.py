@@ -160,7 +160,7 @@ print(entry_orders)
 # ******** RYAN'S CODE FOR EXIT ORDERS ***********
 # Parameters:
 alpha2 = 0.01
-n1 = 5
+n2 = 5
 
 # submitted exit orders
 submitted_exit_orders = pd.DataFrame({
