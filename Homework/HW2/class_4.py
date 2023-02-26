@@ -162,7 +162,9 @@ print(entry_orders)
 alpha2 = 0.01
 n2 = 5
 
-# submitted exit orders
+# if limit order filled, immediately issue a limit order to sell asset at Entry Price * 1+ alpha2
+# submitted_exit_orders
+
 submitted_exit_orders = pd.DataFrame({
     "trade_id": range(1, ivv_prc.shape[0]),
     "date": list(pd.to_datetime(ivv_prc["Date"].iloc[1:]).dt.date),
@@ -171,20 +173,35 @@ submitted_exit_orders = pd.DataFrame({
     "action": "SELL",
     "type": "LMT",
     "price": round(
-        ivv_prc['Close Price'].iloc[:-1] * (1 + alpha2), # !!! change [Close Price] to Entry Price
+        ivv_prc['Close Price'].iloc[:-1] * (1 + alpha2),  # !!! change [Close Price] to Entry Price
         2
     ),
     'status': 'SUBMITTED'
 })
 
-# if limit order filled, immediately issue a limit order to sell asset at Entry Price * 1+ alpha2
-
 
 # calc exit orders that filled; create subset that updates status, date, and price.
+# filled_exit_orders
 
 
 # if exit order not filled by the time market is about to close on n2th trading day,
-# cancel the limit order immediately and issue a market order to sell at the day's closing price.
+# cancel the limit order immediately
+# cancelled_exit_orders
+
+
+# and issue a market order to sell at the day's closing price.
+# market_exit_orders
+
+
+# calc orders that are still live and create a subplot
+# live_exit_orders
+
 
 # combine all captured subsets and add to existing blotter table
-
+entry_orders = pd.concat(
+    submitted_exit_orders,
+    cancelled_exit_orders,
+    filled_exit_orders,
+    market_exit_orders,
+    live_exit_orders
+).sort_values(["date", 'trade_id'])
