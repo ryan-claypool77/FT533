@@ -99,7 +99,7 @@ controls = dbc.Card(
     body=True
 )
 
-image = '/Users/julialeodori/Desktop/fintech-533/ss_react_graph.png'
+image = 'FT533/Homework/HW2/ss_react_graph.png'
 test_base64 = base64.b64encode(open(image, 'rb').read()).decode('ascii')
 img_card = dbc.Card(
     [
