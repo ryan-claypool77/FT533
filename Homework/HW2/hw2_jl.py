@@ -244,7 +244,7 @@ def render_trade_blotter(n_clicks, start_date, end_date, asset):
     submitted_exit_orders['price'] = round(filled_entry_orders['price'] * (1 + alpha2), 2)
     submitted_exit_orders['status'] = 'SUBMITTED'
 
-    # CANCELLED EXIT ORDERS IF SUBMITTED ENTRY ORDER DOES NOT FILL WITHIN N2 DAYS
+    # CANCELLED EXIT ORDERS: IF SUBMITTED ENTRY ORDER DOES NOT FILL WITHIN N2 DAYS
     # with np.errstate(invalid='ignore'):
     #     cancelled_exit_orders = submitted_exit_orders[
     #         np.less(
