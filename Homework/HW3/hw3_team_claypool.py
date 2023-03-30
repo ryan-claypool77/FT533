@@ -92,6 +92,6 @@ def create_ledger(blotter):
     ledger.drop(['price_enter', 'price_exit'], axis=1, inplace=True)
     return ledger
 
-
-ledger = create_ledger(blotter)
-print(ledger)
+# FOR TESTING
+# ledger = create_ledger(blotter)
+# print(ledger)
