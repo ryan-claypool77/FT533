@@ -61,12 +61,13 @@ def create_ledger(blotter):
     ledger['dt_enter'] = pd.to_datetime(ledger['dt_enter'])
     ledger['dt_exit'] = pd.to_datetime(ledger['dt_exit'])
 
+    # print(ledger['dt_enter'].dtypes)
+    # print(ledger['dt_exit'].dtypes)
+
     ledger['n'] = (ledger['dt_exit'] - ledger['dt_enter']) / np.timedelta64(1, 'D') + 1  # REMOVE NON-BUSINESS DAYS
 
     # for line in ledger.iterrows():
-        # line['n'] = np.busday_count(np.datetime64(line['dt_enter']).date(), np.datetime64(line['dt_exit']).date())
-        # generating total days using busday_count()
-        # line['n'] = np.busday_count(line['dt_enter'], line['dt_exit'])
+    #     line['n'] = np.busday_count(line['dt_enter'], line['dt_exit'])
         # print(res)
 
     # 6. 'rtn' column is lambda(filled_exit_price/filled_entry_price) / 'n'
@@ -84,7 +85,7 @@ def create_ledger(blotter):
     ledger['price_exit'] = filled_exit_table['price']
 
     # add returns by index
-    for entry in ledger.iterrows():
+    for index in ledger.iterrows():
         ledger['rtn'] = np.log(ledger['price_exit'] / ledger['price_enter']) / ledger['n']
 
 
@@ -93,5 +94,5 @@ def create_ledger(blotter):
     return ledger
 
 # FOR TESTING
-# ledger = create_ledger(blotter)
-# print(ledger)
+ledger = create_ledger(blotter)
+print(ledger)

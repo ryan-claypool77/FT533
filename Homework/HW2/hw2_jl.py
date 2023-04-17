@@ -85,8 +85,8 @@ controls = dbc.Card(
         dbc.Row([
             dcc.DatePickerRange(
                 id='refinitiv-date-range',
-                min_date_allowed = date(2015, 1, 1),
-                max_date_allowed = datetime.now(),
+                min_date_allowed=date(2015, 1, 1),
+                max_date_allowed=datetime.now(),
                 initial_visible_month=datetime.now()
                 # start_date = datetime.date(
                 #     datetime.now() - timedelta(days=3*365)),
@@ -99,11 +99,11 @@ controls = dbc.Card(
     body=True
 )
 
-image = 'Homework/HW2/ss_react_graph.png'
+image = 'ss_react_graph.png'
 test_base64 = base64.b64encode(open(image, 'rb').read()).decode('ascii')
 img_card = dbc.Card(
     [
-        html.H5('Reactive Graph', style={'text-align':'center'}),
+        html.H5('Reactive Graph', style={'text-align': 'center'}),
         dbc.CardImg(src='data:image/png;base64,{}'.format(test_base64), bottom=True)
     ]
 )
@@ -124,6 +124,7 @@ app.layout = dbc.Container(
     fluid=True
 )
 
+
 @app.callback(
     Output('blotter', 'data'),
     Input('run-query', 'n_clicks'),
@@ -131,7 +132,6 @@ app.layout = dbc.Container(
      State('asset', 'value')],
     prevent_initial_call=True
 )
-
 def render_trade_blotter(n_clicks, start_date, end_date, asset):
     prices, prc_err = ek.get_data(
         instruments=asset,
@@ -199,8 +199,8 @@ def render_trade_blotter(n_clicks, start_date, end_date, asset):
     cancelled_entry_orders.reset_index(drop=True, inplace=True)
     cancelled_entry_orders['status'] = 'CANCELLED'
     cancelled_entry_orders['date'] = pd.DataFrame(
-        {'cancel_date': submitted_entry_orders['date'].iloc[(n1-1):].to_numpy()},
-        index=submitted_entry_orders['date'].iloc[:(1-n1)].to_numpy()
+        {'cancel_date': submitted_entry_orders['date'].iloc[(n1 - 1):].to_numpy()},
+        index=submitted_entry_orders['date'].iloc[:(1 - n1)].to_numpy()
     ).loc[cancelled_entry_orders['date']]['cancel_date'].to_list()
 
     # FILLED ENTRY ORDERS
@@ -212,7 +212,7 @@ def render_trade_blotter(n_clicks, start_date, end_date, asset):
 
     for i in range(0, len(filled_entry_orders)):
         idx1 = np.flatnonzero(prices['Date'] == filled_entry_orders['date'].iloc[i])[0]
-        asset_slice = prices.iloc[idx1:(idx1+n1)]['low']
+        asset_slice = prices.iloc[idx1:(idx1 + n1)]['low']
         fill_inds = asset_slice <= filled_entry_orders['price'].iloc[i]
         if (len(fill_inds) < n1) & (not any(fill_inds)):
             filled_entry_orders.at[i, 'status'] = 'LIVE'
@@ -308,12 +308,13 @@ def render_trade_blotter(n_clicks, start_date, end_date, asset):
         filled_entry_orders,
         live_entry_orders,
         submitted_exit_orders
-    #     # cancelled_exit_orders,
-    #     # filled_exit_orders,
-    #     # live_exit_orders,
-    #     # market_orders
+        #     # cancelled_exit_orders,
+        #     # filled_exit_orders,
+        #     # live_exit_orders,
+        #     # market_orders
     ]).sort_values(['trade_id', 'trip', 'date'])
     return orders.to_dict('records')
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
