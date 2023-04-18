@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, date
 import math
 import pandas as pd
 import numpy as np
-
+from pandas.tseries.offsets import BDay
 
 # blotter_cols = ['trade_id', 'date', 'asset', 'trip', 'action', 'type', 'price', 'status']
 # ledger_cols = ['trade_id', 'asset', 'dt_enter', 'dt_exit', 'success', 'n', 'rtn']
@@ -64,8 +64,10 @@ def create_ledger(blotter):
     # print(ledger['dt_enter'].dtypes)
     # print(ledger['dt_exit'].dtypes)
 
-    ledger['n'] = (ledger['dt_exit'] - ledger['dt_enter']) / np.timedelta64(1, 'D') + 1  # REMOVE NON-BUSINESS DAYS
-
+    # ledger['n'] = (ledger['dt_exit'] - ledger['dt_enter']) / np.timedelta64(1, 'D') + 1  # REMOVE NON-BUSINESS DAYS
+    ledger['n'] = [None if pd.isna(row['dt_enter']) or pd.isna(row['dt_exit'])
+               else len(pd.date_range(start=row['dt_enter'], end=row['dt_exit'], freq=BDay()))
+               for _, row in ledger.iterrows()]
     # for line in ledger.iterrows():
     #     line['n'] = np.busday_count(line['dt_enter'], line['dt_exit'])
         # print(res)
