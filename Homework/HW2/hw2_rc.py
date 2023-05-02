@@ -14,6 +14,7 @@ import base64
 # Refinitiv API Key
 ek.set_app_key(os.getenv('JULSLEO'))
 app = Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 percentage = dash_table.FormatTemplate.percentage(3)
 
 controls = dbc.Card(
